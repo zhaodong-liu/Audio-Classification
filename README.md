@@ -26,8 +26,7 @@ This project implements an ensemble of ResNet34 models to classify 3-second audi
 │   ├── final_comp_report.tex   # LaTeX source
 │   ├── final_competition_sp24.pdf  # Competition guidelines
 │   └── pics/                       # Images and visualizations
-├── junk/                       # Deprecated code
-└── CLAUDE.md                   # AI assistant guidance
+└── junk/                       # Deprecated code
 ```
 
 ## Methodology
