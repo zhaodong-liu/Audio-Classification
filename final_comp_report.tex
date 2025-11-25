@@ -1,0 +1,112 @@
+
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amsthm,amssymb,float}
+
+
+
+
+\begin{document}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newenvironment{ex}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{sol}[1][Solution]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+
+
+
+
+
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+\noindent Zhaodong Liu \hfill {\Large CS 360 Final Competition Report} \hfill \today
+
+\section{Introduction}
+
+\indent\indent Basically, the task of this competition is to classify a song snippet into 4 categories according to the gender of the singers. 
+After implementing several methods of preprocessing, I use \textbf{ResNet} as the model to train the data, and finally achieve the accuracy of 0.8042 as the highest score.
+
+\section{Preprocessing}
+
+\indent\indent For this competition, we have about 12000 snippets of songs, with length of each about 3s as our raw data.
+The mp3 files are not originally suitable for deep learning, so preprocessing step is the starting point of the whole competition and is quite important.\\
+\indent With the hint on audio processing, I tried \textbf{Librosa}, \textbf{torchaudio}, and implement some techiniques like fourier tranform, emphasizing on some frequency, 
+and most importantly, mel-spectrogram to extract the features. I save the mel-spectrogram in graph, but this would lead to some information loss, so finally I use the raw feature of the mel-spectrogram as the dataset input of my model.\\
+\indent Moreover, I shared some idea with my classmates and they gave me advice on using \textbf{spleeter} to separate the vocal part and the background music part. 
+Thus, the feature of audio with only vocal sound could be easier to classify. Afterwards, I found \textbf{spleeter} quite useful, and could bring my model up to 5\% increase in accuracy.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{train_mp3s/6917spectrogram.png}
+    \label{fig:enter-label}
+    \caption{Mel-spectrogram}
+\end{figure}\
+
+\section{Model}
+
+\indent\indent During the competition, I tried several models, including \textbf{CNN}, \textbf{ResNet} and some of its variations. At first, I construct a \textbf{CNN} model with 3 convolutional layers and 2 fully connected layers, but the accuracy is not good enough (About 65\%). 
+Then I tried \textbf{ResNet}, and the accuracy improved a lot. I tried \textbf{ResNet} with different layers, for example, \textbf{ResNet} 18, 34, 50, 101... And also other variations of \textbf{ResNet} like \textbf{DenseNet}. Running a single \textbf{ResNet} model could achieve an accuracy of 0.74 in optimal condition according to my experiment.
+My final submission implements \textbf{ResNet34} model, and I modify some layers to make the model be able to run on the data and work properly on the task. The input layer is changed to accept one dimensional 299*40 data, and the output layer is changed to 4 classes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pics/resnet34.jpg}
+    \label{fig:enter-label}
+    \caption{ResNet34}
+\end{figure}\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pics/model1.png}
+    \label{fig:enter-label}
+    \caption{Model modification}
+\end{figure}\
+
+\section{Experiment}
+
+\indent\indent In the training procedure, I use \textbf{CrossEntropyLoss} as the loss function which is widely used in classification task, and \textbf{AdamW} as the optimizer. 
+The learning rate is set to 3e-4, and the batch size is set to 32. I train the model for about 20 epochs.
+I also add a dropout layer to avoid overfitting, and the dropout rate is set to 0.2.\\
+
+\indent Moreover, I also use the method of ensemble to improve the performance. I train several models with different random seeds, and finally average the output of the models to get the final result. This could improve the accuracy by 2\% to 3\%.
+I tried to train 4 or 5 models simultaneously at the beginning, and I found interesting that once I tried to run a ensemble model with 20 sub models, and the performance increased a lot, though quite time consuming. 
+The ensemble with 20 models finally achieved the highest accuracy of 0.8042 at a try.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pics/ensemble1.png}
+    \label{fig:enter-label}
+    \caption{ensemble implementation}
+\end{figure}\
+
+\indent I also get some of the tricks from my friends. For example I tried \textbf{Mixup}, weight computation, learning rate scheduler.
+Some of the tricks are quite useful.\\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pics/weight_computation.png}
+    \label{fig:enter-label}
+    \caption{weight computation}
+\end{figure}\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{pics/lr_scheduler.png}
+    \label{fig:enter-label}
+    \caption{lr scheduler}
+\end{figure}\
+
+\section{Discussion}
+
+\indent\indent Though I have tried different kinds of \textbf{ResNet} models, I am not sure if I find the best, or a rather better size of model for this task.
+I only tried several learning rate and training epochs, and I am not sure if the model could be improved by tuning the hyperparameters. I would tune the hyperparameters more carefully if there is more time.\\
+\indent Moreover, as I don't have a powerful GPU supporting cuda, I ran all my models on Kaggle platform, and it randomly disconnects, which is quite annoying and time consuming. I would like to have a powerful gaming laptop or rent a personal server next time.
+
+\end{document}
