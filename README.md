@@ -1,6 +1,6 @@
 # Audio Classification for Gender Recognition
 
-A deep learning project for classifying music snippets into 4 categories based on singer gender, developed as the final project for CSCI-SHU 360 Machine Learning.
+A project for classifying music snippets into 4 categories based on singer gender, developed as the final project for CSCI-SHU 360 Machine Learning.
 
 **Final Accuracy: 80.42%**
 
